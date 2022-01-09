@@ -18,7 +18,8 @@
     "@mui/material": "latest",
     "next": "latest",
     "react": "latest",
-    "react-dom": "latest"
+    "react-dom": "latest",
+    "recharts": "^2.1.8"
   },
   "devDependencies": {
     "@types/react": "latest",

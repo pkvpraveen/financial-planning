@@ -1,35 +1,68 @@
-import * as React from 'react';
-import type { NextPage } from 'next';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
+import { Button, Card, CardActions, CardContent, Grid } from '@mui/material';
 import Box from '@mui/material/Box';
-import Link from '../src/Link';
-import ProTip from '../src/ProTip';
-import Copyright from '../src/Copyright';
+import Container from '@mui/material/Container';
+import Link from '@mui/material/Link';
+import Typography from '@mui/material/Typography';
+import Head from 'next/head';
+import Image from 'next/image';
+import * as React from 'react';
+import Layout from '../components/Layout';
 
-const Home: NextPage = () => {
+function Copyright() {
   return (
-    <Container maxWidth="lg">
-      <Box
-        sx={{
-          my: 4,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <Typography variant="h4" component="h1" gutterBottom>
-          MUI v5 + Next.js with TypeScript example
-        </Typography>
-        <Link href="/about" color="secondary">
-          Go to the about page
-        </Link>
-        <ProTip />
-        <Copyright />
-      </Box>
-    </Container>
+    <Typography variant="body2" color="text.secondary">
+      {'Copyright © '}
+      <Link color="inherit" href="https://mui.com/">
+        Your Website
+      </Link>{' '}
+      {new Date().getFullYear()}
+      {'.'}
+    </Typography>
   );
-};
+}
 
-export default Home;
+export default function StickyFooter() {
+  return (
+    <Layout>
+      <Head>
+      <title>Financial Planner</title>
+    </Head>
+      <Container component="main" sx={{ mt: 8, mb: 2, bgcolor: '#fafafa' }} maxWidth="lg">
+        <Grid container spacing={2}>
+          <Grid item md={6} sm={12}>
+            <Typography variant="h4" component="h3" gutterBottom sx={{ textDecoration: 'line-through' }}>
+              Retirement
+            </Typography>
+            <Typography variant="h2" component="h1" gutterBottom >
+              Financial Freedom
+            </Typography>
+            <Typography variant="h5" component="h2" gutterBottom>
+              Find out when you can stop working for money
+            </Typography>
+            <Typography variant="body1">Get rich by understanding how money works & investing in income-producing assets.</Typography>
+            <Box sx={{ mt: 8 }} >
+              <Button variant='contained' LinkComponent={Link} href="/retiretoday" >Start Planning Now</Button>
+            </Box>
+          </Grid>
+          <Grid item md={6} sm={12} sx={{ mt: 3 }}>
+            <Image src='/images/hero.jpg' width={500} height={500} layout='responsive' />
+          </Grid>
+        </Grid>
+        <Card>
+          <CardContent>
+            <Typography variant='h5' component={'h2'}>
+              👨 Jeff is 30 years old.
+            </Typography>
+            <Typography variant='body1'>
+              He spends 25000 per month now. By investing 36117 per month and increase that amount by 5% every year,
+            </Typography>
+            <Typography variant='h5' component="h5">He can stop working for money at the age of 45.</Typography>
+          </CardContent>
+          <CardActions>
+            <Button variant='outlined' fullWidth>Find out yours</Button>
+          </CardActions>
+        </Card>
+      </Container>
+    </Layout>
+  );
+}
