@@ -1,4 +1,4 @@
-function getReturnPercentage(age: number) {
+export function getReturnPercentage(age: number) {
   if (age < 46) {
     return 10;
   } else if (age > 45 && age < 56) {
@@ -12,7 +12,7 @@ function getReturnPercentage(age: number) {
 }
 class Planner {
   getFinancialPlan(ageOfDeath: number, age: number, expense: number, existingInvstment: number,
-    retirementAge: number, yearlyIncrease: number) {
+    retirementAge: number, yearlyIncrease: number, inflation: number) {
     const ageArray = [];
     const expenseWithInflation: Map<number, number> = new Map();
     const savings: Map<number, number> = new Map();
@@ -21,7 +21,7 @@ class Planner {
     ageArray.push(age);
     for (let i = age + 1; i < ageOfDeath + 1; i++) {
       ageArray.push(i);
-      expenseWithInflation.set(i, (expenseWithInflation.get(i - 1) || 0) * (1.06));
+      expenseWithInflation.set(i, (expenseWithInflation.get(i - 1) || 0) * (1 + (inflation/100)));
     }
    
     function calculateSavings() {
@@ -48,11 +48,9 @@ class Planner {
       initialYearlySaving *= 2;
       calculateSavings();
     }
-    console.log(initialYearlySaving, savings.get(ageOfDeath));
     let found = false
     let start = initialYearlySaving / 2;
     let end = initialYearlySaving;
-    console.log({ start, end, savings: savings.get(ageOfDeath) });
 
     do {
       initialYearlySaving = start + ((end - start) / 2);
@@ -64,11 +62,13 @@ class Planner {
       } else {
         end = initialYearlySaving - 1;
       }
-      console.log({ start, end, savings: Math.abs(savings.get(ageOfDeath) || 1) });
     } while (!found)
     return { ageArray, expenseWithInflation, savings, contrubutions };
   }
-  formatToString(val: number) {
+  formatToString(val: number = 0) {
+    if(!val){
+      return '';
+    }
     if (val >= 10000000) {
       return (val / 10000000).toFixed(2) + ' Cr';
     } else if (val >= 100000) {
@@ -77,6 +77,9 @@ class Planner {
   }
   toLakhs(val: number = 0){
     return Math.floor(val/100000);
+  }
+  toCrs(val: number = 0){
+    return (val/10000000);
   }
   
 }

@@ -1,33 +1,44 @@
-import { Button, Card, CardHeader, Container, FormControl, MenuItem, Select, Slider, Stack, TextField, Typography } from "@mui/material";
+import { Container, Slider, Stack, TextField, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import Head from "next/head";
-import { useState } from "react";
-import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { useEffect, useState } from "react";
+import ExplainGraph from "../components/ExplainGraph";
+import Graph from "../components/Graph";
 import Layout from "../components/Layout";
 import planner from "../src/planner";
 
 
 export default function FinancialPlanner() {
-  const [age, setAge] = useState('30');
+  const [age, setAge] = useState(30);
   const [expense, setExpense] = useState('25000');
   const [initialInvestment, setInitialInvestment] = useState('');
   const [yearlyIncrement, setYearlyIncrement] = useState(0);
   const [ageOfDeath, setAgeOfDeath] = useState(85);
   const [ageOfRetirement, setAgeOfRetirement] = useState(60);
-  const ages = [];
-  for (let i = 18; i < 71; i++) {
-    ages.push(i);
-  }
+  const [inflation, setInflation] = useState(6);
+  useEffect(() => {
+    const passedAge = new URLSearchParams(window.location.search)?.get('age') || '';
+    const passedExpense = new URLSearchParams(window.location.search)?.get('expense');
+    if (passedAge) {
+      setAge(+passedAge);
+    }
+    if (passedExpense) {
+      setExpense(passedExpense);
+    }
+  }, []);
   const { savings, ageArray, contrubutions, expenseWithInflation } = planner.getFinancialPlan(ageOfDeath,
-    parseInt(age || '0'),
-    parseInt(expense || '0'),
+    +age,
+    +expense,
     parseInt(initialInvestment || '0'),
     ageOfRetirement,
-    yearlyIncrement);
-  const data = ageArray.filter(a => a % 5 === 0).map(a => ({
+    yearlyIncrement, inflation);
+  const data = ageArray.map(a => ({
     name: a,
-    savings: planner.toLakhs(savings.get(a) || 0),
-    'Yearly Expense With Inflation': planner.toLakhs(expenseWithInflation.get(a) || 0)
+    savings: (savings.get(a) || 0) < 0 ? 0 : savings.get(a) || 0,
+  }));
+  const expenseData = ageArray.map(a => ({
+    name: a,
+    'Yearly Expense With Inflation': expenseWithInflation.get(a)
   }));
 
   return <Layout>
@@ -36,19 +47,22 @@ export default function FinancialPlanner() {
     </Head>
     <Container maxWidth="md" sx={{ mt: 4, p: 4 }}>
       <Stack direction="column" spacing={8}>
-        <Box><Typography variant="subtitle1">Let us find out how much you need to save</Typography></Box>
+        <Box><Typography variant="h3">Retirement Calculator</Typography></Box>
         <Box>
-          <Typography>Please select your age</Typography>
-          <FormControl variant="standard" fullWidth>
-            <Select
-              value={age}
-              label="Age"
-              variant="standard"
-              onChange={e => setAge(e.target.value)}
-            >
-              {ages.map(value => <MenuItem key={value} value={value}>{value}</MenuItem>)}
-            </Select>
-          </FormControl>
+          <Typography>My current age is {age} and I want to retire at age {ageOfRetirement}</Typography>
+          <Slider
+            value={[age, ageOfRetirement]}
+            onChange={(e, newValue: any) => {
+              setAge(newValue[0]);
+              setAgeOfRetirement(newValue[1]);
+            }}
+            valueLabelDisplay="auto"
+            step={1}
+            marks={[{ value: 20, label: `20 years` }, { value: 70, label: `70 years` }]}
+            min={20}
+            disableSwap
+            max={70}
+          />
         </Box>
         <Box>
           <Typography>My expense per month is</Typography>
@@ -56,6 +70,7 @@ export default function FinancialPlanner() {
             variant="standard"
             value={expense}
             fullWidth
+            helperText={`${+expense * 12} per year`}
             onChange={e => setExpense(e.target.value)} />
         </Box>
         <Box>
@@ -66,10 +81,15 @@ export default function FinancialPlanner() {
             fullWidth
             onChange={e => setInitialInvestment(e.target.value)} />
         </Box>
-        <Typography variant="h4">You need to save {((contrubutions.get(+age) || 0) / 12).toFixed(0)} monthly to retire at the age of {ageOfRetirement} years.</Typography>
-        
         <Box>
-          <Typography gutterBottom>I can increase this every year by {yearlyIncrement}%</Typography>
+          <Typography variant="subtitle2" gutterBottom component="span" >You need to save </Typography>
+          <Typography variant="h3" gutterBottom color="primary" component="span">
+            {((contrubutions.get(+age) || 0) / 12).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+          </Typography>
+          <Typography variant="subtitle2" component="span"> to retire at the age of {ageOfRetirement} years.. </Typography>
+        </Box>
+        <Box>
+          <Typography gutterBottom>What if I can increase my monthly investment every year by {yearlyIncrement}%</Typography>
           <Slider
             defaultValue={0}
             value={yearlyIncrement}
@@ -79,19 +99,6 @@ export default function FinancialPlanner() {
             marks={[{ value: 0, label: '0%' }, { value: 10, label: '10%' }]}
             min={0}
             max={10}
-          />
-        </Box>
-        <Box>
-          <Typography gutterBottom>I want to retire at the age of {ageOfRetirement} years</Typography>
-          <Slider
-            defaultValue={0}
-            value={ageOfRetirement}
-            onChange={(e, newValue: any) => setAgeOfRetirement(newValue)}
-            valueLabelDisplay="auto"
-            step={1}
-            marks={[{ value: +age, label: `${age} years` }, { value: 70, label: '70 years' }]}
-            min={+age}
-            max={70}
           />
         </Box>
         <Box>
@@ -107,22 +114,28 @@ export default function FinancialPlanner() {
             max={100}
           />
         </Box>
-        <Card elevation={0}>
-          <CardHeader title="Here is how your savings will last over the years" />
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart
-              data={data}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis mirror tickFormatter={value => `${value} Lac`} />
-              <Tooltip formatter={(value: any) => `${value} Lac`} />
-              <Legend />
-              <Line type="monotone" dataKey="savings" stroke="#8884d8" activeDot={{ r: 8 }} />
-              <Line type="monotone" dataKey="Yearly Expense With Inflation" stroke="#ff0000" activeDot={{ r: 8 }} />
-            </LineChart>
-          </ResponsiveContainer>
-        </Card>
+        <Box>
+          <Graph data={expenseData} title={`This is how your expense of ${expense} will grow over time with ${inflation}% inflation`}
+            lines={[{ key: 'Yearly Expense With Inflation', color: '#ff0000' }]} />
+        </Box>
+        <Box>
+          <Typography gutterBottom>Inflation {inflation}%</Typography>
+          <Slider
+            defaultValue={6}
+            value={inflation}
+            onChange={(e, newValue: any) => setInflation(newValue)}
+            valueLabelDisplay="auto"
+            step={1}
+            marks={[{ value: 0, label: '0%' }, { value: 10, label: '10%' }]}
+            min={0}
+            max={10}
+          />
+        </Box>
+        <Box>
+          <Graph data={data} title={`Here is how your savings will grow and shrink over the years`}
+            lines={[{ key: 'savings', color: "#8884d8" }]} />
+        </Box>
+        <ExplainGraph saving={(savings.get(+age) || 0)} />
       </Stack>
     </Container>
   </Layout>;
