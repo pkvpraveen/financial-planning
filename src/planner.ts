@@ -15,6 +15,7 @@ export function getReturnPercentage(age: number) {
 class Planner {
   getFinancialPlan(ageOfDeath: number, age: number, expense: number, existingInvstment: number,
     retirementAge: number, yearlyIncrease: number, inflation: number) {
+    if (typeof window !== 'undefined') {
       ga.event({
         action: "financial calculation",
         params: {
@@ -27,6 +28,7 @@ class Planner {
           inflation
         }
       })
+    }
     const ageArray = [];
     const expenseWithInflation: Map<number, number> = new Map();
     const savings: Map<number, number> = new Map();
@@ -35,14 +37,14 @@ class Planner {
     ageArray.push(age);
     for (let i = age + 1; i < ageOfDeath + 1; i++) {
       ageArray.push(i);
-      expenseWithInflation.set(i, (expenseWithInflation.get(i - 1) || 0) * (1 + (inflation/100)));
+      expenseWithInflation.set(i, (expenseWithInflation.get(i - 1) || 0) * (1 + (inflation / 100)));
     }
-   
+
     function calculateSavings() {
       let returnPercentage = getReturnPercentage(age);
       contrubutions.set(age, initialYearlySaving);
       savings.set(age, existingInvstment + initialYearlySaving * (1 + returnPercentage / 100));
-      if(age < retirementAge){
+      if (age < retirementAge) {
         for (let i = age + 1; i < retirementAge + 1; i++) {
           returnPercentage = getReturnPercentage(i);
           contrubutions.set(i, (contrubutions.get(i - 1) || 0) * (1 + yearlyIncrease / 100));
@@ -80,7 +82,7 @@ class Planner {
     return { ageArray, expenseWithInflation, savings, contrubutions };
   }
   formatToString(val: number = 0) {
-    if(!val){
+    if (!val) {
       return '';
     }
     if (val >= 10000000) {
@@ -89,13 +91,13 @@ class Planner {
       return (val / 100000).toFixed(2) + ' Lac';
     }
   }
-  toLakhs(val: number = 0){
-    return Math.floor(val/100000);
+  toLakhs(val: number = 0) {
+    return Math.floor(val / 100000);
   }
-  toCrs(val: number = 0){
-    return (val/10000000);
+  toCrs(val: number = 0) {
+    return (val / 10000000);
   }
-  
+
 }
 const planner = new Planner();
 export default planner;
