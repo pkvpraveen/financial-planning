@@ -16,12 +16,14 @@
     "@emotion/styled": "latest",
     "@mui/icons-material": "latest",
     "@mui/material": "latest",
+    "lodash": "^4.17.21",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
     "recharts": "^2.1.8"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.178",
     "@types/react": "latest",
     "eslint": "latest",
     "eslint-config-next": "latest",

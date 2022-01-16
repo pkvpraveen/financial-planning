@@ -3,6 +3,7 @@ import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import * as ga from '../lib/ga'
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -37,10 +38,11 @@ function a11yProps(index: number) {
   };
 }
 
-export default function TabView({tabOne, tabTwo, tabThree}: {
-  tabOne: React.ReactNode,
-  tabTwo: React.ReactNode,
-  tabThree: React.ReactNode,
+export default function TabView({tabOne, tabTwo, tabThree, screen}: {
+  tabOne: React.ReactNode;
+  tabTwo: React.ReactNode;
+  tabThree: React.ReactNode;
+  screen: string;
 }) {
   const [value, setValue] = React.useState(0);
 
@@ -48,13 +50,20 @@ export default function TabView({tabOne, tabTwo, tabThree}: {
     setValue(newValue);
   };
 
+  function countEvent(tab: string, screen: string){
+    ga.event({
+      action: `clicked on tab ${tab} on screen ${screen}`,
+      params: {}
+    })
+  }
+
   return (
     <Box sx={{ width: '100%' }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" variant="fullWidth">
-          <Tab label="Plan" {...a11yProps(0)} />
-          <Tab label="Explain" {...a11yProps(1)} />
-          <Tab label="Advanced" {...a11yProps(2)} />
+          <Tab label="Plan" onClick={() => countEvent('Plan', screen)} {...a11yProps(0)} />
+          <Tab label="Explain" onClick={() => countEvent('Explain', screen)} {...a11yProps(1)} />
+          <Tab label="Advanced" onClick={() => countEvent('Advanced', screen)} {...a11yProps(2)} />
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>

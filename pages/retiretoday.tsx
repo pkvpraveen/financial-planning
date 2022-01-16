@@ -8,6 +8,7 @@ import Layout from "../components/Layout";
 import TabView from "../components/TabView";
 import Link from "../src/Link";
 import planner from "../src/planner";
+import * as ga from '../lib/ga'
 
 
 export default function RetireToday() {
@@ -33,9 +34,10 @@ export default function RetireToday() {
     <Head>
       <title>Retire today</title>
     </Head>
-    <Container component="main" sx={{ mt: 1, px:0, mb: 2, bgcolor: '#fafafa' }} maxWidth="md">
+    <Container component="main" sx={{ mt: 1, px: 0, mb: 2, bgcolor: '#fafafa' }} maxWidth="md">
       <Box mx={1}><Typography variant="h5">Can I Retire Today?</Typography></Box>
       <TabView
+        screen="retire today"
         tabOne={<>
           <Stack direction="column" spacing={4}>
             <Box mx={1}>
@@ -49,6 +51,14 @@ export default function RetireToday() {
                 marks={[{ value: 20, label: '20 years' }, { value: 70, label: '70 years' }]}
                 min={20}
                 max={70}
+                onChangeCommitted={(e, value) => {
+                  ga.event({
+                    action: "retire today age",
+                    params: {
+                      value
+                    }
+                  })
+                }}
               />
             </Box>
             <Box>
@@ -64,6 +74,14 @@ export default function RetireToday() {
                 marks={[{ value: 10000, label: `10k` }, { value: 200000, label: `2 lac` }]}
                 min={10000}
                 max={200000}
+                onChangeCommitted={(e, value) => {
+                  ga.event({
+                    action: "retire today expense",
+                    params: {
+                      value
+                    }
+                  })
+                }}
               />
             </Box>
             <Box>
@@ -75,6 +93,11 @@ export default function RetireToday() {
         </>}
         tabTwo={<>
           <Stack direction="column" spacing={4}>
+            <Box>
+              <Typography variant="subtitle2" gutterBottom component="span" >That means, if I have </Typography>
+              <Typography variant="h4" gutterBottom color="primary" component="span">{planner.formatToString(savings.get(+age) || 0)} </Typography>
+              <Typography variant="subtitle2" component="div"> I can retire today. </Typography>
+            </Box>
             <Graph data={expenseData} title={`This is how your expense of ${`${expense}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")} will grow over time with ${inflation}% inflation`} lines={[{ key: 'Yearly Expense With Inflation', color: '#ff0000' }]} />
             <Graph data={data} title={`Here is how your ${planner.formatToString(savings.get(+age) || 0)} will last over the years`} lines={[{ key: 'savings', color: "#8884d8" }]} />
             <ExplainGraph retireToday saving={(savings.get(+age) || 0)} />
@@ -82,6 +105,11 @@ export default function RetireToday() {
         </>}
         tabThree={<>
           <Stack direction="column" spacing={4}>
+            <Box>
+              <Typography variant="subtitle2" gutterBottom component="span" >That means, if I have </Typography>
+              <Typography variant="h4" gutterBottom color="primary" component="span">{planner.formatToString(savings.get(+age) || 0)} </Typography>
+              <Typography variant="subtitle2" component="div"> I can retire today. </Typography>
+            </Box>
             <Box>
               <Typography gutterBottom>Inflation {inflation}%</Typography>
               <Slider
@@ -102,11 +130,21 @@ export default function RetireToday() {
         <Stack direction="column" spacing={4}>
           <Box>
             <Typography variant="subtitle2">Do not have {planner.formatToString(savings.get(+age) || 0)} now?</Typography>
-            <Typography> Don't worry. We have a <Link href={`/financialplanner?age=${age}&expense=${expense}`}><a>detailed financial planner</a></Link> for you to tweak some values and findout when you can retire and how much you need to save.</Typography>
+            <Typography> Don't worry. We have a <Link href={`/financialplanner?age=${age}&expense=${expense}`}><a onClick={() => {
+              ga.event({
+                action: "start planning now link",
+                params: {}
+              })
+            }}>detailed financial planner</a></Link> for you to tweak some values and findout when you can retire and how much you need to save.</Typography>
           </Box>
 
           <Box>
-            <Button variant="contained" noLinkStyle component={Link} href={`/financialplanner?age=${age}&expense=${expense}`}>Plan my financial freedom in detail</Button>
+            <Button variant="contained" onClick={() => {
+              ga.event({
+                action: "detail planner button",
+                params: {}
+              })
+            }} noLinkStyle component={Link} href={`/financialplanner?age=${age}&expense=${expense}`}>Plan my financial freedom in detail</Button>
           </Box>
         </Stack>
       </Container>

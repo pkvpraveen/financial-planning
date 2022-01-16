@@ -1,4 +1,5 @@
 import * as ga from '../lib/ga'
+import _ from 'lodash';
 
 export function getReturnPercentage(age: number) {
   if (age < 46) {
@@ -16,7 +17,7 @@ class Planner {
   getFinancialPlan(ageOfDeath: number, age: number, expense: number, existingInvstment: number,
     retirementAge: number, yearlyIncrease: number, inflation: number) {
     if (typeof window !== 'undefined') {
-      ga.event({
+      _.debounce(() => ga.event({
         action: "financial calculation",
         params: {
           ageOfDeath,
@@ -27,7 +28,7 @@ class Planner {
           yearlyIncrease,
           inflation
         }
-      })
+      }), 1000);
     }
     const ageArray = [];
     const expenseWithInflation: Map<number, number> = new Map();

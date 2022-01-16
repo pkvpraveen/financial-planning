@@ -7,6 +7,7 @@ import Graph from "../components/Graph";
 import Layout from "../components/Layout";
 import TabView from "../components/TabView";
 import planner from "../src/planner";
+import * as ga from '../lib/ga';
 
 
 export default function FinancialPlanner() {
@@ -33,11 +34,11 @@ export default function FinancialPlanner() {
     parseInt(initialInvestment || '0'),
     ageOfRetirement,
     yearlyIncrement, inflation);
-  const data = ageArray.map(a => ({
+  const data = ageArray.map((a: any) => ({
     name: a,
     savings: (savings.get(a) || 0) < 0 ? 0 : savings.get(a) || 0,
   }));
-  const expenseData = ageArray.map(a => ({
+  const expenseData = ageArray.map((a: any) => ({
     name: a,
     'Yearly Expense With Inflation': expenseWithInflation.get(a)
   }));
@@ -46,8 +47,9 @@ export default function FinancialPlanner() {
     <Head>
       <title>Financial Freedom Calculator</title>
     </Head>
-    <Container component="main" sx={{ mb: 2, px:0, bgcolor: '#fafafa' }} maxWidth="md">
+    <Container component="main" sx={{ mb: 2, px: 0, bgcolor: '#fafafa' }} maxWidth="md">
       <TabView
+        screen="advanced calculator"
         tabOne={<>
           <Stack direction="column" spacing={4}>
             <Box mx={1}>
@@ -64,6 +66,15 @@ export default function FinancialPlanner() {
                 min={20}
                 disableSwap
                 max={70}
+                onChangeCommitted={(e, value:any) => {
+                  ga.event({
+                    action: "advanced calc age and retirement age",
+                    params: {
+                      age: value[0],
+                      retirement: value[1]
+                    }
+                  })
+                }}
               />
             </Box>
             <Box>
@@ -79,6 +90,14 @@ export default function FinancialPlanner() {
                 marks={[{ value: 10000, label: `10k` }, { value: 200000, label: `2 lac` }]}
                 min={10000}
                 max={200000}
+                onChangeCommitted={(e, value) => {
+                  ga.event({
+                    action: "advanced calc expense",
+                    params: {
+                      value
+                    }
+                  })
+                }}
               />
             </Box>
             <Box>
@@ -87,7 +106,15 @@ export default function FinancialPlanner() {
                 variant="standard"
                 value={initialInvestment}
                 fullWidth
-                onChange={e => setInitialInvestment(e.target.value)} />
+                onChange={e => {
+                  setInitialInvestment(e.target.value);
+                    ga.event({
+                      action: "advanced calc existing savings",
+                      params: {
+                        value: e.target.value
+                      }
+                    });
+                }} />
             </Box>
             <Box>
               <Typography variant="subtitle2" gutterBottom component="span" >I need to invest </Typography>
@@ -113,7 +140,13 @@ export default function FinancialPlanner() {
         </>}
         tabTwo={<>
           <Stack direction="column" spacing={4}>
-
+          <Box>
+              <Typography variant="subtitle2" gutterBottom component="span" >I need to invest </Typography>
+              <Typography variant="h3" gutterBottom color="primary" component="span">
+                {((contrubutions.get(+age) || 0) / 12).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+              </Typography>
+              <Typography variant="subtitle2" component="span"> to retire at the age of {ageOfRetirement} years.. </Typography>
+            </Box>
             <Box>
               <Graph data={expenseData} title={`This is how your expense of ${`${expense}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")} will grow over time with ${inflation}% inflation`}
                 lines={[{ key: 'Yearly Expense With Inflation', color: '#ff0000' }]} />
@@ -127,6 +160,13 @@ export default function FinancialPlanner() {
           </Stack></>}
         tabThree={<>
           <Stack direction="column" spacing={4}>
+          <Box>
+              <Typography variant="subtitle2" gutterBottom component="span" >I need to invest </Typography>
+              <Typography variant="h3" gutterBottom color="primary" component="span">
+                {((contrubutions.get(+age) || 0) / 12).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+              </Typography>
+              <Typography variant="subtitle2" component="span"> to retire at the age of {ageOfRetirement} years.. </Typography>
+            </Box>
             <Box mx={1}>
               <Typography gutterBottom>Life Expectancy {ageOfDeath} years</Typography>
               <Slider
@@ -138,6 +178,14 @@ export default function FinancialPlanner() {
                 marks={[{ value: 60, label: '60 years' }, { value: 100, label: '100 years' }]}
                 min={60}
                 max={100}
+                onChangeCommitted={(e, value) => {
+                  ga.event({
+                    action: "advanced calc life expectancy",
+                    params: {
+                      value
+                    }
+                  })
+                }}
               />
             </Box>
             <Box>
@@ -151,6 +199,14 @@ export default function FinancialPlanner() {
                 marks={[{ value: 0, label: '0%' }, { value: 10, label: '10%' }]}
                 min={0}
                 max={10}
+                onChangeCommitted={(e, value) => {
+                  ga.event({
+                    action: "advanced calc inflation",
+                    params: {
+                      value
+                    }
+                  })
+                }}
               />
             </Box>
           </Stack></>}
