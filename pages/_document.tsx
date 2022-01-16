@@ -27,6 +27,8 @@ export default class MyDocument extends Document {
               gtag('js', new Date());
               gtag('config', '${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}', {
                 page_path: window.location.pathname,
+                cookie_domain: 'financialcalculator.netlify.app',
+                cookie_flags: 'SameSite=None;Secure',
               });
           `}}
           />
