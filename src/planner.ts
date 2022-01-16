@@ -1,3 +1,5 @@
+import * as ga from '../lib/ga'
+
 export function getReturnPercentage(age: number) {
   if (age < 46) {
     return 10;
@@ -13,6 +15,18 @@ export function getReturnPercentage(age: number) {
 class Planner {
   getFinancialPlan(ageOfDeath: number, age: number, expense: number, existingInvstment: number,
     retirementAge: number, yearlyIncrease: number, inflation: number) {
+      ga.event({
+        action: "financial calculation",
+        params: {
+          ageOfDeath,
+          age,
+          expense,
+          existingInvstment,
+          retirementAge,
+          yearlyIncrease,
+          inflation
+        }
+      })
     const ageArray = [];
     const expenseWithInflation: Map<number, number> = new Map();
     const savings: Map<number, number> = new Map();
