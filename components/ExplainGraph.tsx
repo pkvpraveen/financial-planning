@@ -15,7 +15,7 @@ export default function ExplainGraph({saving, retireToday}:{saving: number; reti
   <AccordionDetails>
     <Typography>
       {retireToday ?`You will be investing your ${planner.formatToString(saving)} and withdrawing your expenses yearly.`
-      : 'You will be invesing monthly till your retirement. You will be withdrawind your expenses yearly till your life expectency.'}
+      : 'You will be invesing monthly till your retirement. You will be withdrawing your expenses yearly in your life. '}
       As you age, you will move some amount to less riskier assets and hence your return expectation will be less.
       We have taken returns according to below table.</Typography>
       <ReturnTable />

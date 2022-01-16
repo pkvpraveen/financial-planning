@@ -7,19 +7,6 @@ import Head from 'next/head';
 import Image from 'next/image';
 import Layout from '../components/Layout';
 
-function Copyright() {
-  return (
-    <Typography variant="body2" color="text.secondary">
-      {'Copyright © '}
-      <Link href="https://mui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
-
 export default function StickyFooter() {
   return (
     <Layout>
@@ -50,7 +37,7 @@ export default function StickyFooter() {
         <Card>
           <CardContent>
             <Typography variant='h5' component={'h2'}>
-              👨 Jeff is 30 years old.
+              👨 Rohan is 30 years old.
             </Typography>
             <Typography variant='body1'>
               He spends 25000 per month now. By investing 36117 per month and increase that amount by 5% every year,

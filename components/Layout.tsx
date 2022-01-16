@@ -1,10 +1,11 @@
 import { Calculate } from "@mui/icons-material";
-import { AppBar, Container, CssBaseline, Toolbar, Typography } from "@mui/material";
+import { AppBar, ButtonBase, Container, CssBaseline, Toolbar, Typography } from "@mui/material";
 import { Box } from "@mui/system";
+import Link from "next/link";
 import React from "react";
 import Copyright from "../src/Copyright";
 
-export default function Layout({children}: {children: React.ReactNode}){
+export default function Layout({ children }: { children: React.ReactNode }) {
   return <div>
     <Box
       sx={{
@@ -16,14 +17,17 @@ export default function Layout({children}: {children: React.ReactNode}){
       <CssBaseline />
       <AppBar position="relative">
         <Toolbar>
-          <Calculate sx={{ mr: 2 }} />
-          <Typography variant="h6" color="inherit" noWrap>
-            Finalcial Planner
-          </Typography>
+          <Link href='/'>
+            <ButtonBase><Calculate sx={{ mr: 2 }} />
+              <Typography variant="h6" color="inherit" noWrap>
+                Financial Planner
+              </Typography>
+            </ButtonBase>
+          </Link>
         </Toolbar>
       </AppBar>
-    {children}
-    <Box
+      {children}
+      <Box
         component="footer"
         sx={{
           py: 3,
